@@ -20,10 +20,15 @@ YELLOW = (255, 255, 0)
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 
+# define game variables
+intro_count = 3
+last_count_update = pygame.time.get_ticks()
+
 # define fighter variables
 USAGI_SIZE = 1620
-USAGI_SCALE = 0.1
-USAGI_DATA = [USAGI_SIZE, USAGI_SCALE]
+USAGI_SCALE = 0.4
+USAGI_OFFSET = [720, 560]
+USAGI_DATA = [USAGI_SIZE, USAGI_SCALE, USAGI_OFFSET]
 
 # load background image
 bg_image = pygame.image.load("assets/images/background/bg_1_px.png").convert_alpha()
@@ -59,8 +64,8 @@ def draw_health_bar(health, x, y):
     
 
 # create two instances of fighters
-fighter_1 = Fighter(200, 310, USAGI_DATA, usagi_sheet, USAGI_ANIMATION_STEPS)
-fighter_2 = Fighter(700, 310, USAGI_DATA, usagi_sheet, USAGI_ANIMATION_STEPS)
+fighter_1 = Fighter(1, 200, 310, False, USAGI_DATA, usagi_sheet, USAGI_ANIMATION_STEPS)
+fighter_2 = Fighter(2, 700, 310, True, USAGI_DATA, usagi_sheet, USAGI_ANIMATION_STEPS)
 
 # game loop
 run = True
@@ -75,9 +80,22 @@ while run:
     draw_health_bar(fighter_1.health, 20, 20)
     draw_health_bar(fighter_2.health, 580, 20)
 
-    # move fighters
-    fighter_1.move(SCREEN_WIDTH, SCREEN_HEIGHT, screen, fighter_2)
+    if intro_count <= 0:
+        # move fighters
+        fighter_1.move(SCREEN_WIDTH, SCREEN_HEIGHT, screen, fighter_2)
+        fighter_2.move(SCREEN_WIDTH, SCREEN_HEIGHT, screen, fighter_1)
+    else:
+        # update count timer
+        if (pygame.time.get_ticks() - last_count_update) >= 1000:
+            intro_count -= 1
+            last_count_update = pygame.time.get_ticks()
+            print(intro_count)
+    
 
+    # update fighters
+    fighter_1.update()
+    fighter_2.update()
+    
     # draw fighters
     fighter_1.draw(screen)
     fighter_2.draw(screen)
